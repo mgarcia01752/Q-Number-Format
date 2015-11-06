@@ -1,5 +1,7 @@
 package com.mgarcia.qnumberformat.test;
 
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
+
 import com.mgarcia.qnumberformat.api.QNumberFormatNotation;
 
 
@@ -25,6 +27,7 @@ import com.mgarcia.qnumberformat.api.QNumberFormatNotation;
 public class QFormatFixedPointTest {
 
 	public static void main(String[] args) {
+		
 		/* 
 		 * https://en.wikipedia.org/wiki/Q_(number_format)#Q_to_float
 		 *  s   3           12
@@ -37,13 +40,15 @@ public class QFormatFixedPointTest {
 		 * */
 		String s16Bits3_12 = "e4:00";
 		System.out.println("+-------------------------------------------------------------------------------------+");
-		byte[] baS3_12Format = QNumberFormatNotation.ToByteArray(s16Bits3_12);
+		byte[] baS3_12Format = QFormatFixedPointTest.ToByteArray(s16Bits3_12);
 		QNumberFormatNotation qtd = new QNumberFormatNotation("s3.12",baS3_12Format,QNumberFormatNotation.BIG_ENDIAN);	
 		System.out.println(qtd.toString());
 		System.out.println("Double: " + qtd.toDouble());
 		System.out.println("Float: " + qtd.toFloat());
+		
+		
 		System.out.println("+-------------------------------------------------------------------------------------+");
-		baS3_12Format = QNumberFormatNotation.ToByteArray(s16Bits3_12);	
+		baS3_12Format = QFormatFixedPointTest.ToByteArray(s16Bits3_12);	
 		qtd = new QNumberFormatNotation("u3.12",baS3_12Format,QNumberFormatNotation.BIG_ENDIAN);		
 		System.out.println(qtd.toString());
 		System.out.println("Double: " + qtd.toDouble());
@@ -52,18 +57,46 @@ public class QFormatFixedPointTest {
 		
 		s16Bits3_12 = "14:00";
 		System.out.println("+-------------------------------------------------------------------------------------+");
-		baS3_12Format = QNumberFormatNotation.ToByteArray(s16Bits3_12);
+		baS3_12Format = QFormatFixedPointTest.ToByteArray(s16Bits3_12);
 		qtd = new QNumberFormatNotation("s3.12",baS3_12Format,QNumberFormatNotation.BIG_ENDIAN);	
 		System.out.println(qtd.toString());
 		System.out.println("Double: " + qtd.toDouble());
 		System.out.println("Float: " + qtd.toFloat());
+		
+		
 		System.out.println("+-------------------------------------------------------------------------------------+");
-		baS3_12Format = QNumberFormatNotation.ToByteArray(s16Bits3_12);	
+		baS3_12Format = QFormatFixedPointTest.ToByteArray(s16Bits3_12);	
 		qtd = new QNumberFormatNotation("u3.12",baS3_12Format,QNumberFormatNotation.BIG_ENDIAN);		
 		System.out.println(qtd.toString());
 		System.out.println("Double: " + qtd.toDouble());
 		System.out.println("Float: " + qtd.toFloat());
 
+	}
+	
+	/**
+	 * 
+	 * @param sHexString
+	 * @return
+	 */
+	public static byte[] ToByteArray(String sHexString) {
+		
+		Boolean localDebug = Boolean.FALSE;
+		
+		if (localDebug)
+			System.out.println("HexString.toByteArray(s) " + sHexString);
+		
+		//Remove HEX Notation
+		sHexString = sHexString.replace("0x","");
+		
+		//Need to add HexString Check	
+		sHexString = sHexString	.replaceAll("(\\]|\\)|\\}|\\(|\\[|\\{)", "")
+								.replace(":", "")
+								//mgarcia 141206 - Added new Replace Check
+								.replace(".","");
+		
+		HexBinaryAdapter hba = new HexBinaryAdapter();	     
+	     
+		return hba.unmarshal(sHexString.replace(" ", ""));
 	}
 
 }
