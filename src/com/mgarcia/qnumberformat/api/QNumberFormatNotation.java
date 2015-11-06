@@ -1,9 +1,13 @@
-package com.mgarcia.qnumberformat;
+package com.mgarcia.qnumberformat.api;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
+
 
 /*
  * 	Licensed to the Apache Software Foundation (ASF) under one
@@ -125,6 +129,35 @@ public class QNumberFormatNotation {
 				"Fractional-Fixed-Point-Bits: " + iFractionalBits + "\n" +
 				"Input: " + toHexString(this.baFixedPointData)+ " -> Output: " + this.sFixedPointConvertedOutput;
 		
+	}
+	
+	/**
+	 * 
+	 * @param sHexString
+	 * @return ByteArray of HexString
+	 */
+	public static byte[] ToByteArray(String sHexString) {
+		
+		Boolean localDebug = Boolean.FALSE;
+		
+		if (localDebug)
+			System.out.println("HexString.toByteArray(s) " + sHexString);
+		
+		//Remove HEX Notation
+		sHexString = sHexString.replace("0x","");
+		
+		//Need to add HexString Check	
+		sHexString = sHexString	.replaceAll("(\\]|\\)|\\}|\\(|\\[|\\{)", "")
+								.replace(":", "")
+								//mgarcia 141206 - Added new Replace Check
+								.replace(".","");
+		
+		HexBinaryAdapter hba = new HexBinaryAdapter();	     
+	     
+	     if (isModulus(sHexString.replace(" ", "")))
+	    	 return hba.unmarshal(sHexString.replace(" ", ""));
+	     else
+	    	 return hba.unmarshal("");
 	}
 	
 	/**
@@ -286,7 +319,6 @@ public class QNumberFormatNotation {
 		return sb.toString();
 	}
 	
-
 	/**
 	 * 
 	 * @param sHexString
