@@ -23,7 +23,8 @@ import com.mgarcia.qnumberformat.api.QNumberFormatNotation;
 	specific language governing permissions and limitations
 	under the License.
 	
-	Author: maurice.garcia.2015@gmail.com
+	Author: Maurice Garcia
+	email:	maurice.garcia.2015@gmail.com
  */
 
 public class QFormatFixedPointTest {
