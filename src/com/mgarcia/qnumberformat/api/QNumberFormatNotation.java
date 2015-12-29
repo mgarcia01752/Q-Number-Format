@@ -1,8 +1,5 @@
 package com.mgarcia.qnumberformat.api;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.math.BigInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +24,7 @@ import java.util.regex.Pattern;
 	Author: Maurice Garcia
 	email:	maurice.garcia.2015@gmail.com
  */
+
 public class QNumberFormatNotation {
 	
 	private byte[] baFixedPointData;
@@ -39,15 +37,14 @@ public class QNumberFormatNotation {
 	private int iFractionalBits = 0;
 	
 	private final int MAX_BIT_SIZE = 32;
-	
-	private int iFixedPointInteger = 0;
-	private double dFractionalValue = 0;
-	private String sFixedPointConvertedOutput;
+		
+	private double dQNumber;
 	
 	//Format: s3.12
-	private final Pattern FIXED_POINT_NOTATION = Pattern.compile(""
+ 	private final Pattern FIXED_POINT_NOTATION = Pattern.compile(""
 			+ "^(s|u)(\\d+)\\.(\\d+)", Pattern.CASE_INSENSITIVE);
 	
+	@SuppressWarnings("unused")
 	private final String SIGNED = "s";
 	@SuppressWarnings("unused")
 	private final String UNSIGNED = "u";
@@ -55,7 +52,7 @@ public class QNumberFormatNotation {
 	public static int BIG_ENDIAN = 1;
 	public static int LITTLE_ENDIAN = 0;
 	
-	public boolean DEBUG = Boolean.TRUE;
+	public boolean DEBUG = Boolean.FALSE;
 
 	/**
 	 * 
@@ -106,7 +103,7 @@ public class QNumberFormatNotation {
 	 * @return Double of the FixedPoint Data
 	 */
 	public double toDouble() {
-		return new Double(sFixedPointConvertedOutput);
+		return this.dQNumber;
 	}
 	
 	/**
@@ -114,7 +111,7 @@ public class QNumberFormatNotation {
 	 * @return float of the FixedPoint Data
 	 */
 	public float toFloat() {
-		return new Float(sFixedPointConvertedOutput);
+		return (float)this.dQNumber;
 	}
 
 	/**
@@ -127,9 +124,32 @@ public class QNumberFormatNotation {
 				"Signed|Unsigned: " + sSignUnsignFormat + "\n" +
 				"Integer-Fixed-Point-Bits: " + iIntegerBits + "\n" +
 				"Fractional-Fixed-Point-Bits: " + iFractionalBits + "\n" +
-				"Input: " + toHexString(this.baFixedPointData)+ " -> Output: " + this.sFixedPointConvertedOutput;
+				"Output: " + dQNumber;
 		
 	}
+	
+	/**
+	 * 
+	 * @param str
+	 * @return
+	 * @throws java.lang.Exception
+	 */
+	public static Integer twosComp(String str) throws java.lang.Exception {
+	    
+		Integer iInt = null;
+		
+		//System.out.println("twosCompNibble(String str) : " + str);
+		
+		if(str.length() <= 4) {
+			Short num = Short.parseShort(str, 2);
+			iInt = (int) ((num > Math.pow(2, str.length()-1)) ? num - Math.pow(2, str.length()) : num);			
+		} else if ((str.length() <= 16) && (str.length() > 4)) {
+			Integer num = Integer.parseInt(str, 2);
+			iInt = (int) ((num > Math.pow(2, str.length()-1)) ? num - Math.pow(2, str.length()) : num);	
+		}
+		
+		return iInt;
+	 }
 		
 	/**
 	 * Verifies that byte array is of proper length against Q number Format
@@ -179,135 +199,43 @@ public class QNumberFormatNotation {
 		
 		if (boolDebug) System.out.println("Fixed-Point-Notation: (" + sFixedPointNotation + ")");
 		
-		/*Convert to 4 Byte Unsigned Integer*/
-		int iFixedPointFraction = toUnsignedInt(baFixedPointData);
-		if (boolDebug) System.out.println("Integer: " + iFixedPointFraction + " \t\t\tHex: " + toHexString(baFixedPointData));
+		String sBin = "";
 		
-		if (sSignUnsignFormat.equalsIgnoreCase(SIGNED)) {
-			/*Convert to 4Byte Signed Integer */
-			this.iFixedPointInteger = toSignedInt(baFixedPointData);
-		} else {
-			/*Convert to 4Byte UnSigned Integer */
-			this.iFixedPointInteger = toUnsignedInt(baFixedPointData);				
-		}
-		if (boolDebug) System.out.println("Integer: " + iFixedPointInteger + " U/S-Bit: " + sSignUnsignFormat + " \tHex: " + toHexString(baFixedPointData));
-		
-		/*Bit Shift to determine Fractional Value */
-		iFixedPointFraction = iFixedPointFraction << (MAX_BIT_SIZE - iFractionalBits);
-		if (boolDebug) System.out.println("Shift << : " + iFixedPointFraction + " \t\tHex: " + toHexString(iFixedPointFraction) + " NumberToShift: " + (MAX_BIT_SIZE - iFractionalBits));
-		
-		/*Bit Shift to determine Integer */
-		if (iFractionalBits > 0) {
-			this.iFixedPointInteger = this.iFixedPointInteger >> iFractionalBits;
-		
-			if (boolDebug) System.out.println("Shift >> : " + iFixedPointInteger + " \t\tHex: " + toHexString(iFixedPointInteger) + " NumberToShift: " + iFractionalBits);
-	
-			/*Figure out Base2 Fractional Value 2^-(32)*/
-			this.dFractionalValue = iFixedPointFraction * Math.pow(2,(-MAX_BIT_SIZE));
-			if (boolDebug) System.out.println("Fraction: " + dFractionalValue + " \t\t\tHex: " + toHexString(dFractionalValue));
+		for (byte b : baFixedPointData) {
+		    sBin += Integer.toBinaryString(b & 255 | 256).substring(1);
 		}
 		
-		/*Final String Output - Total Hack*/
-		String sDecimal = ""+dFractionalValue;
-		this.sFixedPointConvertedOutput = iFixedPointInteger + sDecimal.replaceAll("0\\.",".");
-		if (boolDebug) System.out.println("Input: " + toHexString(this.baFixedPointData) + " -> Output: " + this.sFixedPointConvertedOutput);		
-	}
-	
-	/**
-	 * 
-	 * @param baUnsigedInt
-	 * @return
-	 */
-	private static int toUnsignedInt(byte[] baUnsigedInt) {
-		ByteArrayOutputStream  baosByteToInt = new ByteArrayOutputStream();
+		StringBuilder sb = new StringBuilder(sBin);
 		
-		while ((baosByteToInt.size()+baUnsigedInt.length) < 4) {
-			baosByteToInt.write(0x00);
+		/*Incase that there are no fractional Bits */
+		
+		Double dFractionConvert = 0.0;
+		
+		if (this.iFractionalBits != 0) {
+			
+			CharSequence csFractionalBits = sb.subSequence((sb.length() - this.iFractionalBits),sb.length());
+			//System.out.println("FractionalBits: " + csFractionalBits);
+			
+			int iFraction = Integer.parseInt((String) csFractionalBits, 2);
+			dFractionConvert = iFraction/Math.pow(2, 12);
+			//System.out.println("Fraction: " + dFractionConvert);
+		
 		}
-
+		
+		
+		CharSequence csInteger = sb.subSequence(0,iIntegerBits+1 );
+		Integer iSINT = null;
+		
 		try {
-			baosByteToInt.write(baUnsigedInt);
-		} catch (IOException e) {
+			iSINT = twosComp((String)csInteger);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-				
-		byte[] bByteToInt = baosByteToInt.toByteArray();
 		
-		return 	bByteToInt[0] << 24 | 
-				(bByteToInt[1] & 0xFF) << 16 | 
-				(bByteToInt[2] & 0xFF) << 8 | 
-				(bByteToInt[3] & 0xFF);	
-	}
-	
-	/**
-	 * 
-	 * @param baUnsignedInt
-	 * @return
-	 */
-	private static int toSignedInt(byte[] baSignedInt) {
-		return new BigInteger(baSignedInt).intValue();
-	}
-	
-	/**
-	 * 
-	 * @param ba
-	 * @return
-	 */
-	private static String toHexString(Integer iValue) {
-		if (isModulus(Integer.toHexString(iValue).toUpperCase())) {
-			return Integer.toHexString(iValue).toUpperCase();
-		} else {
-			return "0" + Integer.toHexString(iValue).toUpperCase();	
-		}
-	}
-	
-	/**
-	 * 
-	 * @param dValue
-	 * @return
-	 */
-	private static String toHexString(Double dValue) {
-		if (isModulus(Double.toHexString(dValue).toUpperCase())) {
-			return Double.toHexString(dValue).toUpperCase();
-		} else {
-			return "0" + Double.toHexString(dValue).toUpperCase();	
-		}
-	}
-	
-	/**
-	 * 
-	 * @param ba
-	 * @return
-	 */
-	private static String toHexString(byte[] ba) {
+		//System.out.println("SignInteger: " + iSINT);
 		
-		StringBuilder sb = new StringBuilder();
+		this.dQNumber = Double.parseDouble(iSINT.toString()+dFractionConvert.toString().replaceFirst("^0", ""));
 		
-		for (byte bByte : ba) {
-			sb.append(String.format("%02X ", bByte));
-		}
-		
-		return sb.toString();
 	}
-	
-	/**
-	 * 
-	 * @param sHexString
-	 * @return
-	 */
-	private static boolean isModulus(String sHexString) {
 
-		//Some Clean up in case it is separated by spaces and colons
-		String regex = "//s+|/:";
-		String replacement = "";
-
-		sHexString.replaceAll(regex, replacement);
-
-		//Check modulus for even pair
-		if ((sHexString.length() % 2) == 0) {
-			return true;
-		} else  {
-			return false;
-		}
-	}
 }
