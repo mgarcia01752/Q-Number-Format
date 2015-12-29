@@ -39,9 +39,17 @@ public class QFormatFixedPointTest {
 		 * Float 1.25 - s3.12 Format -> 0xe400 -> 16bits 
 		 * */
 		
+		byte[] baReadMePostive = new byte[] {(byte)0x14, (byte)0x00};
+		QNumberFormatNotation qnfn = new QNumberFormatNotation("s3.12", baReadMePostive);
+		System.out.println("QNumberFormatNotation(s3.12, 1400): " + qnfn.toDouble());
+		
+		byte[] baReadMeNegative = new byte[] {(byte)0xF4, (byte)0x00};
+		qnfn = new QNumberFormatNotation("s3.12", baReadMeNegative);
+		System.out.println("QNumberFormatNotation(s3.12, f400): " + qnfn.toDouble());
+		
 		byte[] baData = new byte[] {(byte)0xFF, (byte)0xF0};
 		
-		QNumberFormatNotation qnfn = new QNumberFormatNotation("s3.12", baData);
+		qnfn = new QNumberFormatNotation("s3.12", baData);
 		System.out.println("QNumberFormatNotation(s3.12, fff0): " + qnfn.toDouble());
 		
 		qnfn = new QNumberFormatNotation("s2.13", baData);
@@ -55,6 +63,8 @@ public class QFormatFixedPointTest {
 		
 		/* 							Output
 		 * 
+			QNumberFormatNotation(s3.12, 1400): 1.25
+			QNumberFormatNotation(s3.12, f400): -1.25
 			QNumberFormatNotation(s3.12, fff0): -1.99609375
 			QNumberFormatNotation(s2.13, fff0): -11.99609375
 			QNumberFormatNotation(s1.14, fff0): -13.99609375
