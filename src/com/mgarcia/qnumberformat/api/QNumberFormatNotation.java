@@ -217,7 +217,7 @@ public class QNumberFormatNotation {
 			//System.out.println("FractionalBits: " + csFractionalBits);
 			
 			int iFraction = Integer.parseInt((String) csFractionalBits, 2);
-			dFractionConvert = iFraction/Math.pow(2, 12);
+			dFractionConvert = iFraction/Math.pow(2, this.iFractionalBits);
 			//System.out.println("Fraction: " + dFractionConvert);
 		
 		}
