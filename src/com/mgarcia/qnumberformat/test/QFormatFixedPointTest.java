@@ -61,14 +61,36 @@ public class QFormatFixedPointTest {
 		qnfn = new QNumberFormatNotation("s15.0", baData);
 		System.out.println("QNumberFormatNotation(s15.0, fff0): " + qnfn.toDouble());
 		
+		baData = new byte[] {(byte)0x24, (byte)0x00};
+		qnfn = new QNumberFormatNotation("s1.14", baData);
+		System.out.println("QNumberFormatNotation(s1.14, 2400): " + qnfn.toDouble());
+		
+		qnfn = new QNumberFormatNotation("s2.13", baData);
+		System.out.println("QNumberFormatNotation(s2.13, 2400): " + qnfn.toDouble());
+		
+		qnfn = new QNumberFormatNotation("s3.12", baData);
+		System.out.println("QNumberFormatNotation(s3.12, 2400): " + qnfn.toDouble());
+		
+		baData = new byte[] {(byte)0xf8, (byte)0x00};
+		qnfn = new QNumberFormatNotation("s1.14", baData);
+		System.out.println("QNumberFormatNotation(s1.14, f800): " + qnfn.toDouble());
+		
+		qnfn = new QNumberFormatNotation("s2.13", baData);
+		System.out.println("QNumberFormatNotation(s2.13, f800): " + qnfn.toDouble());
+		
+		qnfn = new QNumberFormatNotation("s3.12", baData);
+		System.out.println("QNumberFormatNotation(s3.12, f800): " + qnfn.toDouble());
+		
 		/* 							Output
 		 * 
-			QNumberFormatNotation(s3.12, 1400): 1.25
-			QNumberFormatNotation(s3.12, f400): -1.25
-			QNumberFormatNotation(s3.12, fff0): -1.99609375
-			QNumberFormatNotation(s2.13, fff0): -11.99609375
-			QNumberFormatNotation(s1.14, fff0): -13.99609375
-			QNumberFormatNotation(s15.0, fff0): -16.0
+				QNumberFormatNotation(s3.12, 1400): 1.25
+				QNumberFormatNotation(s3.12, f400): -1.25
+				QNumberFormatNotation(s3.12, fff0): -1.99609375
+				QNumberFormatNotation(s2.13, fff0): -1.998046875
+				QNumberFormatNotation(s1.14, fff0): -1.9990234375
+				QNumberFormatNotation(s15.0, fff0): -16.0
+				QNumberFormatNotation(s2.13, 2400): 1.125
+				QNumberFormatNotation(s2.13, f800): -1.75
 			
 		*/
 
