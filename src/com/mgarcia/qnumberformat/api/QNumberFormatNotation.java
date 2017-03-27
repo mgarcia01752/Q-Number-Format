@@ -1,5 +1,6 @@
 package com.mgarcia.qnumberformat.api;
 
+import java.math.BigInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -138,7 +139,7 @@ public class QNumberFormatNotation {
 	    
 		Integer iInt = null;
 		
-		//System.out.println("twosCompNibble(String str) : " + str);
+		System.out.println("twosCompNibble(String str) : " + str);
 		
 		if(str.length() <= 4) {
 			Short num = Short.parseShort(str, 2);
@@ -196,46 +197,26 @@ public class QNumberFormatNotation {
 	private void calculateFixPointToDouble() {
 		
 		boolean boolDebug = (DEBUG|Boolean.FALSE);
+		boolean isNegative = false;
 		
 		if (boolDebug) System.out.println("Fixed-Point-Notation: (" + sFixedPointNotation + ")");
 		
-		String sBin = "";
+		int iCodeWord =  new BigInteger(baFixedPointData).intValue(); 
+		if (boolDebug) System.out.println("CodeWord: " + iCodeWord + 			 "         -> " + Integer.toBinaryString(iCodeWord));
 		
-		for (byte b : baFixedPointData) {
-		    sBin += Integer.toBinaryString(b & 255 | 256).substring(1);
+		if (iCodeWord < 0) {
+			isNegative = true;
+			iCodeWord  =~ iCodeWord + 1;
+			if (boolDebug) System.out.println("CodeWord-FlipBits: " + iCodeWord + " ->                     " + Integer.toBinaryString(iCodeWord));			
 		}
 		
-		StringBuilder sb = new StringBuilder(sBin);
+		this.dQNumber = (double)iCodeWord*Math.pow(2,-iFractionalBits);
 		
-		/*Incase that there are no fractional Bits */
+		/* If negative bit is on, flip answer to negative */
+		if (isNegative)this.dQNumber*=-1;
 		
-		Double dFractionConvert = 0.0;
-		
-		if (this.iFractionalBits != 0) {
-			
-			CharSequence csFractionalBits = sb.subSequence((sb.length() - this.iFractionalBits),sb.length());
-			//System.out.println("FractionalBits: " + csFractionalBits);
-			
-			int iFraction = Integer.parseInt((String) csFractionalBits, 2);
-			dFractionConvert = iFraction/Math.pow(2, this.iFractionalBits);
-			//System.out.println("Fraction: " + dFractionConvert);
-		
-		}
-		
-		
-		CharSequence csInteger = sb.subSequence(0,iIntegerBits+1 );
-		Integer iSINT = null;
-		
-		try {
-			iSINT = twosComp((String)csInteger);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		//System.out.println("SignInteger: " + iSINT);
-		
-		this.dQNumber = Double.parseDouble(iSINT.toString()+dFractionConvert.toString().replaceFirst("^0", ""));
-		
+		if (boolDebug) System.out.println("Fraction: " + this.dQNumber + " ->                     " + Integer.toBinaryString((int) this.dQNumber));
+	
 	}
 
 }
