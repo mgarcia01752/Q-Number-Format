@@ -38,16 +38,19 @@ public class QFormatFixedPointTest {
 		 * [1]1[11].[0100.0000.0000] = 0x1400 -> -1.25
 		 * Float 1.25 - s3.12 Format -> 0xe400 -> 16bits 
 		 * */
+
+		QNumberFormatNotation qnfn = null;
+		byte[] baData; 
 		
 		byte[] baReadMePostive = new byte[] {(byte)0x14, (byte)0x00};
-		QNumberFormatNotation qnfn = new QNumberFormatNotation("s3.12", baReadMePostive);
+		qnfn = new QNumberFormatNotation("s3.12", baReadMePostive);
 		System.out.println("QNumberFormatNotation(s3.12, 1400): " + qnfn.toDouble());
 		
 		byte[] baReadMeNegative = new byte[] {(byte)0xF4, (byte)0x00};
 		qnfn = new QNumberFormatNotation("s3.12", baReadMeNegative);
 		System.out.println("QNumberFormatNotation(s3.12, f400): " + qnfn.toDouble());
 		
-		byte[] baData = new byte[] {(byte)0xFF, (byte)0xF0};
+		baData = new byte[] {(byte)0xFF, (byte)0xF0};
 		
 		qnfn = new QNumberFormatNotation("s3.12", baData);
 		System.out.println("QNumberFormatNotation(s3.12, fff0): " + qnfn.toDouble());
@@ -80,17 +83,28 @@ public class QFormatFixedPointTest {
 		
 		qnfn = new QNumberFormatNotation("s3.12", baData);
 		System.out.println("QNumberFormatNotation(s3.12, f800): " + qnfn.toDouble());
+
+		baData = new byte[] {(byte)0xB8, (byte)0x00};
+		qnfn = new QNumberFormatNotation("s2.13", baData);
+		System.out.println("QNumberFormatNotation(s3.12, b800): " + qnfn.toDouble());
+	
+				
 		
 		/* 							Output
 		 * 
-				QNumberFormatNotation(s3.12, 1400): 1.25
-				QNumberFormatNotation(s3.12, f400): -1.25
-				QNumberFormatNotation(s3.12, fff0): -1.99609375
-				QNumberFormatNotation(s2.13, fff0): -1.998046875
-				QNumberFormatNotation(s1.14, fff0): -1.9990234375
-				QNumberFormatNotation(s15.0, fff0): -16.0
-				QNumberFormatNotation(s2.13, 2400): 1.125
-				QNumberFormatNotation(s2.13, f800): -1.75
+					QNumberFormatNotation(s3.12, 1400): 1.25
+					QNumberFormatNotation(s3.12, f400): -0.75
+					QNumberFormatNotation(s3.12, fff0): -0.00390625
+					QNumberFormatNotation(s2.13, fff0): -0.001953125
+					QNumberFormatNotation(s1.14, fff0): -9.765625E-4
+					QNumberFormatNotation(s15.0, fff0): -16.0
+					QNumberFormatNotation(s1.14, 2400): 0.5625
+					QNumberFormatNotation(s2.13, 2400): 1.125
+					QNumberFormatNotation(s3.12, 2400): 2.25
+					QNumberFormatNotation(s1.14, f800): -0.125
+					QNumberFormatNotation(s2.13, f800): -0.25
+					QNumberFormatNotation(s3.12, f800): -0.5
+					QNumberFormatNotation(s3.12, B800): -2.25
 			
 		*/
 
