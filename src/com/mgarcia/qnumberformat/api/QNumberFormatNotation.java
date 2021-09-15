@@ -72,12 +72,9 @@ public class QNumberFormatNotation {
 		this.baFixedPointData = baFixedPointData;
 		this.iEndianness = iEndianness;
 		
-		checkUpdateQNumberFormat();
-		
-		isByteArrayLengthCorrect();
-		
+		checkUpdateQNumberFormat();		
+		isByteArrayLengthCorrect();		
 		calculateFixPointToDouble();
-
 	}
 	
 	/**
@@ -91,12 +88,9 @@ public class QNumberFormatNotation {
 		this.sFixedPointNotation = sFixedPointNotation;
 		this.baFixedPointData = baFixedPointData;
 		
-		checkUpdateQNumberFormat();
-		
-		isByteArrayLengthCorrect();
-		
+		checkUpdateQNumberFormat();		
+		isByteArrayLengthCorrect();		
 		calculateFixPointToDouble();
-
 	}
 	
 	/**
@@ -125,8 +119,7 @@ public class QNumberFormatNotation {
 				"Signed|Unsigned: " + sSignUnsignFormat + "\n" +
 				"Integer-Fixed-Point-Bits: " + iIntegerBits + "\n" +
 				"Fractional-Fixed-Point-Bits: " + iFractionalBits + "\n" +
-				"Output: " + dQNumber;
-		
+				"Output: " + dQNumber;		
 	}
 	
 	/**
@@ -202,12 +195,12 @@ public class QNumberFormatNotation {
 		if (boolDebug) System.out.println("Fixed-Point-Notation: (" + sFixedPointNotation + ")");
 		
 		int iCodeWord =  new BigInteger(baFixedPointData).intValue(); 
-		if (boolDebug) System.out.println("CodeWord: " + iCodeWord + 			 "         -> " + Integer.toBinaryString(iCodeWord));
+		if (boolDebug) System.out.println("CodeWord: " + iCodeWord + "         -> " + Integer.toBinaryString(iCodeWord));
 		
 		if (iCodeWord < 0) {
 			isNegative = true;
 			iCodeWord  =~ iCodeWord + 1;
-			if (boolDebug) System.out.println("CodeWord-FlipBits: " + iCodeWord + " ->                     " + Integer.toBinaryString(iCodeWord));			
+			if (boolDebug) System.out.println("CodeWord-FlipBits: " + iCodeWord + " -> " + Integer.toBinaryString(iCodeWord));			
 		}
 		
 		this.dQNumber = (double)iCodeWord*Math.pow(2,-iFractionalBits);
@@ -215,8 +208,6 @@ public class QNumberFormatNotation {
 		/* If negative bit is on, flip answer to negative */
 		if (isNegative)this.dQNumber*=-1;
 		
-		if (boolDebug) System.out.println("Fraction: " + this.dQNumber + " ->                     " + Integer.toBinaryString((int) this.dQNumber));
-	
+		if (boolDebug) System.out.println("Fraction: " + this.dQNumber + " -> " + Integer.toBinaryString((int) this.dQNumber));
 	}
-
 }
